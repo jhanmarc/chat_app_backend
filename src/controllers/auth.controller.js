@@ -8,8 +8,8 @@ exports.login = async (req = request, res = response ) => {
     try {
         const user = await User.findOne({ email: req.body.email })
         if(!user) return res.status(400).json({ok:false, msg: 'User no found'})
-        console.log(user.password);
-        const validatePass = User.comparePassword(user.password, req.body.password)
+        const validatePass = await User.comparePassword(user.password, req.body.password)
+        console.log(validatePass);
         if(!validatePass) return res.status(400).json({ok:false, msg: 'password no incorrect'})
         const token = await jwt.createToken(user._id);
         res.json({ok: true, token})
