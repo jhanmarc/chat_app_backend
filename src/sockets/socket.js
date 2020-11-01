@@ -1,10 +1,22 @@
 const { io } = require('../index')
 
+const jwt = require('../middleware/jwt')
 
-io.on('connection', client => {
-    console.log('Client connect');
+const scc = require('../controllers/socket.controller')
 
-    client.on('disconnect', () => {
-        console.log("Client connect");
+
+io.on('connection', async (client) => {
+    // console.log('Client connect');
+
+    // console.log();
+    const [ valido, uid ] = jwt.verifySocketToken(client.handshake.headers['x-token'])
+    if(!valido) { return client.disconnect() }
+
+    await scc.userConnect( uid )
+
+
+    client.on('disconnect', async () => {
+        console.log("Client disconnect");
+        await scc.userDisconnect( uid )
     })
 });
