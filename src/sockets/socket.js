@@ -12,11 +12,20 @@ io.on('connection', async (client) => {
     const [ valido, uid ] = jwt.verifySocketToken(client.handshake.headers['x-token'])
     if(!valido) { return client.disconnect() }
 
+    // Cliente  autenticado
     await scc.userConnect( uid )
+
+    //Ingresar al usuario a una sala en particular
+
+    client.join( uid );
+
+    client.on('message-personal', async (payload) => {
+        await scc.saveMessage(payload)
+        io.to( payload.to ).emit('message-personal', payload)
+    })
 
 
     client.on('disconnect', async () => {
-        console.log("Client disconnect");
         await scc.userDisconnect( uid )
     })
 });

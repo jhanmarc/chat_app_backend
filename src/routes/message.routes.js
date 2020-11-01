@@ -3,6 +3,6 @@ const router = Router();
 
 const cc = require('../controllers')
 
-router.get('/', cc.Users.getUsers)
+router.get('/:from', cc.Messages.getChat)
 
 module.exports = router;

@@ -11,7 +11,7 @@ exports.getUsers = async( req = request, res = response) => {
             .sort('-online')
             .skip(last)
             .limit(20)
-        res.json({ ok:true, users})
+        return res.json({ ok:true, users})
     } catch (error) {
         
     }
