@@ -8,10 +8,10 @@ exports.login = async (req = request, res = response ) => {
     try {
         const user = await User.findOne({ email: req.body.email })
         if(!user) return res.status(400).json({ok:false, msg: 'User no found'})
-        const validatePass = await User.comparePassword(user.password, req.body.password)
-        if(!validatePass) return res.status(400).json({ok:false, msg: 'password no incorrect'})
+        const validatePass = await User.comparePassword(req.body.password, user.password)
+        if(!validatePass) return res.status(400).json({ok:false, msg: 'password incorrect'})
         const token = await jwt.createToken(user._id);
-        res.json({ok: true, token})
+        res.json({ok: true, user, token})
     } catch (error) {
         res.status(500).json({ok:false, msg:'Error'+ error })
     }
@@ -22,13 +22,13 @@ exports.register = async(req = request, res = response ) => {
     try {
         const existUser = await User.findOne({ email : req.body.email })
         if(existUser){
-            return res.status(400).json({ok: false, msg:'Elige otro usuario'})
+            return res.status(400).json({ok: false, msg:'Elige otro usuario, este no esta disponible.'})
         }
         const user = new User(req.body)
         user.password = await User.encryptPassword(user.password)
         await user.save()
-        const toke = await jwt.createToken(user._id)
-        res.json({ ok:true, user, toke, msg:'created successfull'})
+        const token = await jwt.createToken(user._id)
+        res.json({ ok:true, user, token })
     } catch (error) {
         res.status(500).json({ok:false, msg:'Error'+ error })
     }
